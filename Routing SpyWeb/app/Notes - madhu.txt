@@ -1,0 +1,122 @@
+conda env list 				-> see all existing enve
+conda remove --name <env_name> --all	-> remove not needed enve
+conda create -n myenv python=3.7.4  	-> if doesn't exist else just activate 
+D: # D:\NVG\NyleTech\App\app
+cd app
+conda activate myenv
+pip install -r requirements.txt
+pip install geopy
+pip install pandas==1.1.2 # replacing 1.1.0
+cls 					-> clear
+python app.py
+
+conda deactivate			-> deactivate enve
+
+
+http://0.0.0.0:8000/master_route
+http://0.0.0.0:8000/master_route_new
+http://0.0.0.0:8000/trip_generation
+http://0.0.0.0:8000/master_route_distance
+
+
+
+
+
+
+
+
+
+
+
+
+
+Data Visualization:
+
+Matplotlib & Seaborn: For basic plotting in Python.
+Plotly: For interactive visualizations.
+Geopandas: Extends Pandas to support spatial data operations.
+Shapely: For geometric operations.
+Fiona: For reading and writing vector data.
+Folium: For creating interactive maps.
+Pyproj: For cartographic projections and coordinate transformations.
+Scikit-mobility: For analyzing mobility data.
+
+
+
+
+
+
+
+
+
+1. Data Preparation
+Collect Data: Ensure you have the latitude and longitude coordinates of all users and the destination.
+Normalize Coordinates: If the range of coordinates is large, normalization can help improve the performance of clustering algorithms.
+2. Choosing the Clustering Algorithm
+Several clustering algorithms can be used to group users based on their coordinates:
+
+
+
+K-Means Clustering
+Description: Partitions data into k clusters where each data point belongs to the cluster with the nearest mean.
+Pros: Simple and efficient for large datasets.
+Cons: Requires the number of clusters (k) to be specified in advance.
+
+Implementation:
+from sklearn.cluster import KMeans
+import numpy as np
+
+coordinates = np.array([[lat1, lon1], [lat2, lon2], ..., [latN, lonN]])
+kmeans = KMeans(n_clusters=k)
+kmeans.fit(coordinates)
+labels = kmeans.labels_
+
+
+
+DBSCAN (Density-Based Spatial Clustering of Applications with Noise)
+Description: Clusters based on the density of data points, useful for identifying clusters of varying shapes and sizes.
+Pros: Does not require the number of clusters to be specified; can identify noise/outliers.
+Cons: Requires parameters eps (maximum distance between two points to be considered in the same neighborhood) and min_samples (minimum number of points to form a dense region).
+
+Implementation:
+from sklearn.cluster import DBSCAN
+
+dbscan = DBSCAN(eps=0.1, min_samples=5)
+labels = dbscan.fit_predict(coordinates)
+
+
+
+Agglomerative Clustering
+Description: A hierarchical clustering method that builds nested clusters by merging or splitting them.
+Pros: No need to specify the number of clusters in advance; dendrograms can help determine the optimal number of clusters.
+Cons: Computationally expensive for large datasets.
+
+Implementation:
+from sklearn.cluster import AgglomerativeClustering
+
+agglomerative = AgglomerativeClustering(n_clusters=k)
+labels = agglomerative.fit_predict(coordinates)
+
+
+3. Evaluating the Clusters
+Silhouette Score: Measures how similar an object is to its own cluster compared to other clusters.
+from sklearn.metrics import silhouette_score
+
+score = silhouette_score(coordinates, labels)
+
+
+
+Visual Inspection: Plot the clusters on a map to visually inspect if the grouping makes sense.
+import matplotlib.pyplot as plt
+
+plt.scatter(coordinates[:, 0], coordinates[:, 1], c=labels, cmap='rainbow')
+plt.xlabel('Latitude')
+plt.ylabel('Longitude')
+plt.show()
+
+
+4. Optimizing Transportation
+Centroid Calculation: For each cluster, calculate the centroid which can be used as a pickup point for the group.
+centroids = kmeans.cluster_centers_
+
+Route Planning: Use routing algorithms to plan the optimal path from each centroid to the destination. Tools like Google Maps API or OpenStreetMap can be helpful.
